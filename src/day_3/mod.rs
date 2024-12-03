@@ -14,11 +14,8 @@ pub fn part_1(file_path: &str) -> i32 {
 
 pub fn part_2(file_path: &str) -> i32 {
     let contents = fs::read_to_string(file_path).expect("Failed to read file.");
-    // . does not match newlines
-    let contents = contents.replace("\n", " ");
 
-    // try iterating over don't() do() and mul()
-    let regex_dont_do = Regex::new(r"don't\(\).*?(?:do\(\)|$)").unwrap();
+    let regex_dont_do = Regex::new(r"(?s)don't\(\).*?(?:do\(\)|$)").unwrap();
     let contents = regex_dont_do.replace_all(contents.as_str(), " ");
 
     let regex = Regex::new(r"mul\((?<left>\d{1,3}),(?<right>\d{1,3})\)").unwrap();
