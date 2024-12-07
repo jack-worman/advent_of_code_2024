@@ -30,7 +30,6 @@ pub fn part_2(file_path: &str) -> u32 {
         }
         let mut cloned_map = map.clone();
         cloned_map[cell.0][cell.1] = '#';
-        let cloned_map = cloned_map;
         let handle = thread::spawn(move || {
             let (_, is_loop) = run_map(&cloned_map);
             is_loop
