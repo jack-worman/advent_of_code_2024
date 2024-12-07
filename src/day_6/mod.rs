@@ -1,4 +1,5 @@
 use std::fs;
+use std::thread;
 
 #[derive(PartialEq, Clone)]
 enum Direction {
@@ -18,20 +19,30 @@ pub fn part_1(file_path: &str) -> u32 {
 pub fn part_2(file_path: &str) -> u32 {
     let contents = fs::read_to_string(file_path).expect("Failed to read file.");
 
-    let mut map = parse_input(contents);
+    let map = parse_input(contents);
     let (walked, _) = run_map(&map);
 
-    let mut loops = 0;
+    let mut handles = Vec::new();
+
     for cell in walked {
         if map[cell.0][cell.1] != '.' {
             continue;
         }
-        map[cell.0][cell.1] = '#';
-        let (_, is_loop) = run_map(&map);
-        if is_loop {
+        let mut cloned_map = map.clone();
+        cloned_map[cell.0][cell.1] = '#';
+        let cloned_map = cloned_map;
+        let handle = thread::spawn(move || {
+            let (_, is_loop) = run_map(&cloned_map);
+            is_loop
+        });
+        handles.push(handle);
+    }
+
+    let mut loops = 0;
+    for handle in handles {
+        if handle.join().unwrap() {
             loops += 1;
         }
-        map[cell.0][cell.1] = '.';
     }
     loops
 }
